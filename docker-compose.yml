@@ -1,0 +1,117 @@
+
+networks:
+  messagehub-network:
+    name: messagehub-network
+    driver: bridge
+
+services:
+  messagehub-api-service:
+    image: ${DOCKER_REGISTRY-}messagehubapi
+    container_name: messagehub-api
+    build:
+      context: .
+      dockerfile: src/MessageHub.Api/Dockerfile
+    networks:
+      - messagehub-network
+    volumes:
+      - ./.containers/api:/app/Storage
+    ports:
+       - 5000:8080
+       - 5001:8081
+    depends_on:
+      - messagehub-rabbitmq-service
+      - messagehub-database-service
+  
+       
+  messagehub-database-service:
+    image: postgres:latest
+    container_name: messagehub-database
+    environment:
+      - POSTGRES_DB=messagehub
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - messagehub-network
+    volumes:
+      - ./.containers/db:/var/lib/postgresql/data
+      
+    ports:
+      - 5432:5432
+ 
+  messagehub-rabbitmq-service:
+    image: rabbitmq:management
+    container_name: messagehub-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: dev
+      RABBITMQ_DEFAULT_PASS: dev
+    networks:
+      - messagehub-network
+    ports:
+      - 5672:5672
+      - 15672:15672
+     
+  messagehub-elastic-service:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    container_name: messagehub-elastic
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - cluster.routing.allocation.disk.watermark.low=20gb
+      - cluster.routing.allocation.disk.watermark.high=10gb
+      - cluster.routing.allocation.disk.watermark.flood_stage=5gb
+      - cluster.info.update.interval=1m
+      - ELASTIC_PASSWORD=elastic
+    networks:
+      - messagehub-network
+    volumes:
+      - ./.containers/elasticsearch:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+
+  messagehub-kibana-service:
+    image: docker.elastic.co/kibana/kibana:8.7.1
+    container_name: messagehub-kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - messagehub-network
+    volumes:
+      - ./.containers/kibana:/usr/share/kibana/data
+    environment:
+      ELASTICSEARCH_URL: http://messagehub-elastic-service:9200
+      ELASTICSEARCH_HOSTS: http://messagehub-elastic-service:9200
+    depends_on:
+      - messagehub-elastic-service
+       
+  messsagehub-prometheus-service:
+    container_name: messagehub-prometheus
+    image: prom/prometheus:latest
+   
+    ports:
+      - 9090:9090
+    networks:
+      - messagehub-network
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - messagehub-api-service
+  
+  messagehub-grafana-service:
+    container_name: messagehub-grafana
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_USER=test
+      - GF_SECURITY_ADMIN_PASSWORD=test
+    ports:
+      - 3000:3000
+    networks:
+      - messagehub-network
+    volumes:
+      - ./.containers/grafana/provisioning:/etc/grafana/provisioning
+      - ./.containers/grafana/data:/var/lib/grafana
+    depends_on: 
+      - messsagehub-prometheus-service

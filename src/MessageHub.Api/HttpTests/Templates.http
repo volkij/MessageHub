@@ -1,0 +1,13 @@
+
+POST {{HostAddress}}/api/v{{Version}}/templates/reload HTTP/1.1
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "Url": "http://messagehub-api:8080/templates/templates.json"
+
+}
+
+### Request GET
+GET {{HostAddress}}/api/v{{Version}}/templates HTTP/1.1
+X-API-KEY: {{ApiKey}}

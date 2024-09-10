@@ -1,0 +1,13 @@
+
+
+POST {{HostAddress}}/api/v{{Version}}/pushtokens HTTP/1.1
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "externalClientID": "12345",
+  "value": "token1"
+}
+
+
+

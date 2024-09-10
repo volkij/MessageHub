@@ -1,0 +1,33 @@
+
+POST {{HostAddress}}/api/v{{Version}}/messages HTTP/1.1
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "type": "email",
+  "contactValue": "test@test.com",
+  "content": "<p>Ahoj $@Jmeno@$,</p>\n<p>Dìkujeme, že jste se pøihlásili k odbìru našich novinek. Jsme rádi, že vás máme mezi námi!</p>\n<p>Pro více informací navštivte náš web.</p>\n<p>S pozdravem,<br>Tým $@Company@$</p>",
+  "subject": "test",
+  "tags": [
+    "test",
+    "VisualStudio"
+  ],
+  "contentAttributes": [
+    {
+      "name": "Jmeno",
+      "value": "John"
+    },
+    {
+      "name": "Company",
+      "value": "Firma"
+    }
+  ]
+}
+
+### Request GET
+GET {{HostAddress}}/api/v{{Version}}/messages?messageType=PUSH&externalClientId=5288926 HTTP/1.1
+X-API-KEY: {{ApiKey}}
+
+### Request MarkAsRead
+PUT {{HostAddress}}/api/v{{Version}}/messages/markasread/3128 HTTP/1.1
+X-API-KEY: {{ApiKey}}

@@ -1,0 +1,21 @@
+
+POST {{HostAddress}}/api/v{{Version}}/messages HTTP/1.1
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "type": "sms",
+  "contactValue": "+420777777888",
+  "content": "Ahoj $@Jmeno@$ tady máš SMS",
+  "senderCode": "WebHookSms",
+  "contentAttributes": [
+    {
+      "name": "Jmeno",
+      "value": "Johna"
+    }
+  ]
+
+}
+
+
+

@@ -1,0 +1,20 @@
+
+POST {{HostAddress}}/api/v{{Version}}/messages HTTP/1.1
+Content-Type: application/json
+X-API-KEY: {{ApiKey}}
+
+{
+  "type": "push",
+  "externalClientID": "12345",
+  "content": "Ahoj $@Jmeno@$ MessageHub",
+  "subject": "Pozdrav z MessageHub vèetnì expirace ",
+  "category": "WELCOME",
+  "contentAttributes": [
+    {
+      "name": "Jmeno",
+      "value": "John"
+    }
+  ]
+
+}
+

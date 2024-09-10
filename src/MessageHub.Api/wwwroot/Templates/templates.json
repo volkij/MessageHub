@@ -1,0 +1,25 @@
+{
+    "Templates": [
+      {
+        "Name": "Template1",
+        "Type": "sms",
+        "Code": "Template1",
+        "Subject": "",
+        "Url": "http://messagehub-api:8080/templates/template1.html"
+      },
+      {
+        "Name": "Template2",
+        "Type": "email",
+        "Code": "Template2",
+        "Subject": "Toto je test mail",
+        "Url": "http://messagehub-api:8080/templates/template2.html"
+      },
+      {
+        "Name": "Template3",
+        "Type": "push",
+        "Code": "Template3",
+        "Subject": "subject univerzalni",
+        "Url": "http://messagehub-api:8080/templates/template3.html"
+      }
+    ]
+}
