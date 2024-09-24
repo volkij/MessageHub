@@ -2,6 +2,9 @@
 
 namespace MessageHub.Domain.DTO
 {
+    /// <summary>
+    /// Request for creating a message
+    /// </summary>
     public class CreateMessageRequest
     {
         [JsonPropertyName("type")]

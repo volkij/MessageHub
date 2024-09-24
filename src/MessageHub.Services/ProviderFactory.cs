@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 /// <summary>
-/// Create or retrieve provider instances
+/// Create or retrieve Sender provider instances
 /// </summary>
 public class ProviderFactory
 {

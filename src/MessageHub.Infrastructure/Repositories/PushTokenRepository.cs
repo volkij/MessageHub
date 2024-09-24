@@ -21,12 +21,12 @@ namespace MessageHub.Infrastructure.Repositories
             return _context.PushTokens.Where(t => t.ExternalClientID == externalClientID).ToList();
         }
 
-        public List<PushToken> GetValidByExternalClient(string externalClientID, string account, string senderCode)
+        public async Task<List<PushToken>> GetValidByExternalClientAsync(string externalClientID, string account, string senderCode)
         {
-            return _context.PushTokens
+            return await _context.PushTokens
                 .Where(t => t.ExternalClientID == externalClientID
                 && t.ExpirationDate == null
-                && t.Account == account).ToList();
+                && t.Account == account).ToListAsync();
         }
     }
 }

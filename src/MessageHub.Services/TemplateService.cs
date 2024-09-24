@@ -2,6 +2,7 @@
 using MessageHub.Domain.Entities;
 using MessageHub.Domain.Enums;
 using MessageHub.Infrastructure.Repositories;
+using MessageHub.Services.Base;
 using Microsoft.Extensions.Logging;
 
 namespace MessageHub.Services
@@ -14,11 +15,11 @@ namespace MessageHub.Services
         /// <summary>
         /// Apply template to message
         /// </summary>
-        public Message ProcessMessage(Message message)
+        public async Task<Message> ProcessMessage(Message message)
         {
             if (!string.IsNullOrEmpty(message.TemplateCode))
             {
-                Template template = UnitOfWork.TemplateRepository.GetTemplateByCode(message.TemplateCode);
+                Template? template = await UnitOfWork.TemplateRepository.GetTemplateByCodeAsync(message.TemplateCode);
                 if (template == null)
                 {
                     message.MessageStatus = MessageStatus.Failed;

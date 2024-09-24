@@ -5,6 +5,7 @@ using MessageHub.Domain.Enums;
 using MessageHub.Domain.Events;
 using MessageHub.Domain.Exceptions;
 using MessageHub.Infrastructure.Repositories;
+using MessageHub.Services.Base;
 using MessageHub.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,7 +29,7 @@ namespace MessageHub.Services
             return senderConfig;
         }
 
-        public void SendMessage<TMessage>(int messageID, TMessage message, string senderCode, MessageType messageType)
+        public async Task SendMessageAsync<TMessage>(int messageID, TMessage message, string senderCode, MessageType messageType)
         {
             Message dbMessage = UnitOfWork.MessageRepository.GetById(messageID);
             try
@@ -49,7 +50,7 @@ namespace MessageHub.Services
                     dbMessage.MessageStatus = MessageStatus.SentFailed;
                 }
 
-                _publishEndpoint.Publish(new ProviderResultEvent(result, dbMessage.Id), context =>
+                await _publishEndpoint.Publish(new ProviderResultEvent(result, dbMessage.Id), context =>
                 {
                     context.SetRoutingKey(Infrastructure.ServiceBus.RoutingKeys.New);
                 });
@@ -62,7 +63,7 @@ namespace MessageHub.Services
             }
             finally
             {
-                UnitOfWork.SaveChanges();
+                await UnitOfWork.SaveChangesAsync();
             }
         }
 

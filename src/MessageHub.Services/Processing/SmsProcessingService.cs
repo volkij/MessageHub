@@ -15,17 +15,17 @@ namespace MessageHub.Services.Processing
     {
         public MessageType MessageType => MessageType.SMS;
 
-        public void ProcessMessage(Message message, SenderConfig senderConfig)
+        public async Task ProcessMessage(Message message, SenderConfig senderConfig)
         {
             string phone = message.ContactValue.Replace(" ", "");
             string text = RemoveSpecialCharacters(message.Content);
 
             SmsMessage smsMessage = new(senderConfig.PhoneName, phone, text);
 
-            QueueMessage(new SmsQueuedEvent(smsMessage, message.Id, senderConfig.Code), message);
+            await QueueMessage(new SmsQueuedEvent(smsMessage, message.Id, senderConfig.Code), message);
         }
 
-        private static string RemoveSpecialCharacters(string input)
+        private string RemoveSpecialCharacters(string input)
         {
             if (string.IsNullOrEmpty(input))
                 return input;

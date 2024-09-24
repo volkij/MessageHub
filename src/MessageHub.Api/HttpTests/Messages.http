@@ -29,5 +29,5 @@ GET {{HostAddress}}/api/v{{Version}}/messages?messageType=PUSH&externalClientId=
 X-API-KEY: {{ApiKey}}
 
 ### Request MarkAsRead
-PUT {{HostAddress}}/api/v{{Version}}/messages/markasread/3128 HTTP/1.1
+PUT {{HostAddress}}/api/v{{Version}}/messages/3128/markasread HTTP/1.1
 X-API-KEY: {{ApiKey}}

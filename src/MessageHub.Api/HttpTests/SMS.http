@@ -8,6 +8,7 @@ X-API-KEY: {{ApiKey}}
   "contactValue": "+420777777888",
   "content": "Ahoj $@Jmeno@$ tady máš SMS",
   "senderCode": "WebHookSms",
+  "templateCode" : "invalid",
   "contentAttributes": [
     {
       "name": "Jmeno",

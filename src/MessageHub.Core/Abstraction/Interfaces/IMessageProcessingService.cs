@@ -5,7 +5,7 @@ namespace MessageHub.Core.Abstraction.Interfaces
 {
     public interface IMessageProcessingService
     {
-        void ProcessMessage(Message message, SenderConfig senderConfig);
+        Task ProcessMessage(Message message, SenderConfig senderConfig);
         MessageType MessageType { get; }
     }
 }

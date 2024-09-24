@@ -12,16 +12,16 @@ namespace MessageHub.Services.Processing
     {
         public MessageType MessageType => MessageType.PUSH;
 
-        public void ProcessMessage(Message message, SenderConfig senderConfig)
+        public async Task ProcessMessage(Message message, SenderConfig senderConfig)
         {
-            List<PushToken> listOfToken = UnitOfWork.PushTokenRepository.GetValidByExternalClient(message.ExternalClientID, message.Account, message.SenderCode);
+            List<PushToken> listOfToken = await UnitOfWork.PushTokenRepository.GetValidByExternalClientAsync(message.ExternalClientID, message.Account, message.SenderCode);
 
             if (listOfToken.Count == 0)
                 throw new Exception("No tokens for PushMessage");
 
             PushMessage pushMessage = new(message.Subject, message.Content, listOfToken.Select(x => x.Value).ToList(), message.ExternalMessageID);
 
-            QueueMessage(new PushQueuedEvent(pushMessage, message.Id, senderConfig.Code), message);
+            await QueueMessage(new PushQueuedEvent(pushMessage, message.Id, senderConfig.Code), message);
         }
     }
 }

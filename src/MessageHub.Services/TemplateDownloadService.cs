@@ -2,6 +2,7 @@
 using MessageHub.Domain.Entities;
 using MessageHub.Domain.Exceptions;
 using MessageHub.Infrastructure.Repositories;
+using MessageHub.Services.Base;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -33,11 +34,11 @@ namespace MessageHub.Services
                     var templateContent = await _httpClient.GetStringAsync(templateInfo.Url);
                     Logger.LogDebug("Template downloaded successfully {code}", templateInfo.Code);
 
-                    Template template = UnitOfWork.TemplateRepository.GetTemplateByCode(templateInfo.Code);
+                    Template? template = await UnitOfWork.TemplateRepository.GetTemplateByCodeAsync(templateInfo.Code);
                     if (template == null)
                     {
                         template = new Template();
-                        UnitOfWork.TemplateRepository.Insert(template);
+                        await UnitOfWork.TemplateRepository.InsertAsync(template);
                     }
 
                     template.Type = templateInfo.Type;

@@ -7,6 +7,7 @@ using MessageHub.Domain.Exceptions;
 using MessageHub.Domain.Validators;
 using MessageHub.Infrastructure;
 using MessageHub.Infrastructure.Repositories;
+using MessageHub.Services.Base;
 using MessageHub.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ namespace MessageHub.Services
             _accountConfig = accountConfig.Value;
         }
 
-        public void ProcessRequestToMessage(CreateMessageRequest request, string accountName)
+        public async Task ProcessRequestToMessage(CreateMessageRequest request, string accountName)
         {
             Message messageEntity = Mapper.MapToEntity(request);
             messageEntity.Account = accountName;
@@ -51,49 +52,53 @@ namespace MessageHub.Services
             SenderConfig senderConfig = _senderService.GetSenderByCode(messageEntity.SenderCode);
 
 
-            messageEntity = _templateService.ProcessMessage(messageEntity);
+            messageEntity = await _templateService.ProcessMessage(messageEntity);
 
-            UnitOfWork.MessageRepository.Insert(messageEntity);
-            UnitOfWork.SaveChanges();
+            await UnitOfWork.MessageRepository.InsertAsync(messageEntity);
+            await UnitOfWork.SaveChangesAsync();
 
-            MessageServiceValidator messageValidator = new MessageServiceValidator();
-            var validationResult = messageValidator.Validate(messageEntity);
-
-            if (validationResult.IsValid)
+            if (messageEntity.MessageStatus != MessageStatus.Failed)
             {
-                if (messageEntity.Expiration < DateTime.UtcNow)
-                {
-                    ChangeMessageStatus(messageEntity, MessageStatus.Expired);
-                    return;
-                }
+                MessageServiceValidator messageValidator = new MessageServiceValidator();
+                var validationResult = messageValidator.Validate(messageEntity);
 
-                var processor = _messageProcessingServices.FirstOrDefault(p => p.MessageType == messageEntity.MessageType);
-                if (processor == null)
+                if (validationResult.IsValid)
                 {
-                    throw new MessageHubException("Invalid message type");
-                }
-                processor.ProcessMessage(messageEntity, senderConfig);
-            }
-            else
-            {
-                foreach (var error in validationResult.Errors)
-                {
-                    Logger.LogWarning($"Message {messageEntity.Id} validation error: {error.ErrorMessage}");
-                }
+                    if (messageEntity.Expiration < DateTime.UtcNow)
+                    {
+                        await ChangeMessageStatus(messageEntity, MessageStatus.Expired);
+                        return;
+                    }
 
-                ChangeMessageStatus(messageEntity, MessageStatus.Failed);
+                    var processor = _messageProcessingServices.FirstOrDefault(p => p.MessageType == messageEntity.MessageType);
+                    if (processor == null)
+                    {
+                        throw new MessageHubException("Invalid message type");
+                    }
+                    await processor.ProcessMessage(messageEntity, senderConfig);
+                }
+                else
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        Logger.LogWarning($"Message {messageEntity.Id} validation error: {error.ErrorMessage}");
+                    }
+
+                    await ChangeMessageStatus(messageEntity, MessageStatus.Failed);
+                }
             }
+
         }
 
-        public Message GetById(int id)
+        public async Task<Message> GetByIdAsync(int id)
         {
-            return UnitOfWork.MessageRepository.GetById(id);
+            return await UnitOfWork.MessageRepository.GetByIdAsync(id);
         }
 
-        public void ChangeMessageStatus(Message message, MessageStatus status)
+        public async Task ChangeMessageStatus(Message message, MessageStatus status)
         {
             message.MessageStatus = status;
-            UnitOfWork.SaveChanges();
+            await UnitOfWork.SaveChangesAsync();
         }
 
         public async Task<List<GetMessageResponse>> GetMessagesByTypeAndExternalClientAsync(string messageType, string externalClientID)

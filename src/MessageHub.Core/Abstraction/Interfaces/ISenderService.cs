@@ -6,6 +6,6 @@ namespace MessageHub.Core.Abstraction.Interfaces
     {
         SenderConfig GetSenderByCode(string senderCode);
 
-        void SendMessage<TMessage>(int messageID, TMessage message, string senderCode, MessageType messageType);
+        Task SendMessageAsync<TMessage>(int messageID, TMessage message, string senderCode, MessageType messageType);
     }
 }

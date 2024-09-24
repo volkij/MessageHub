@@ -222,7 +222,7 @@ namespace MessageHub.Client
                 client.DefaultRequestHeaders.Add("X-API-Key", _apiKey);
 
                 // Odeslání PUT požadavku
-                var apiResponse = await client.PutAsync(_baseUrl + $"/api/v{_version}/messages/markasread/{messageID}", null);
+                var apiResponse = await client.PutAsync(_baseUrl + $"/api/v{_version}/messages/{messageID}/markasread", null);
 
                 Response response = new Response() { StatusCode = apiResponse.StatusCode };
                 return response;

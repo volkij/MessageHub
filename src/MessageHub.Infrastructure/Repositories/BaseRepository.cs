@@ -27,6 +27,12 @@ namespace MessageHub.Infrastructure.Repositories
             _context.Set<T>().Add(entity);
         }
 
+        public async Task<T> InsertAsync(T entity)
+        {
+            await _context.Set<T>().AddAsync(entity);
+            return entity;
+        }
+
         public void Delete(T entity)
         {
             _context.Set<T>().Remove(entity);

@@ -29,25 +29,10 @@ namespace MessageHub.Providers.EuroSms
 
             try
             {
-                string xml = $@"<?xml version=""1.0"" encoding=""UTF-8""?>
-                            <sms i=""{_senderConfig.UserName}"" s=""{CreateSignature(_senderConfig.Password, message.PhoneNumber)}"">
-                                <sender>{message.Sender}</sender>
-                                <number>{message.PhoneNumber}</number>
-                                <msg>{message.Text}</msg>
-                            </sms>";
-
-                var data = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("action", "send1SMS"),
-                    new KeyValuePair<string, string>("xml", xml)
-                };
-
-                HttpContent content = new FormUrlEncodedContent(data);
-
                 using var httpClient = new HttpClient();
                 Logger.LogDebug("Sending POST to EuroSMS");
 
-                var response = await httpClient.PostAsync(_senderConfig.Url, content);
+                var response = await httpClient.PostAsync(_senderConfig.Url, this.CreateEuroSMSContent(message));
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 Logger.LogDebug($"Response from EuroSMS: Status code: {response.StatusCode}, {responseString}");
@@ -80,6 +65,29 @@ namespace MessageHub.Providers.EuroSms
             }
 
             return result;
+        }
+
+        private HttpContent CreateEuroSMSContent(SmsMessage message)
+        {
+            var xmlBuilder = new StringBuilder();
+            xmlBuilder.Append(@"<?xml version=""1.0"" encoding=""UTF-8""?>")
+                      .Append("<sms ")
+                      .Append($@"i=""{_senderConfig.UserName}"" ")
+                      .Append($@"s=""{CreateSignature(_senderConfig.Password, message.PhoneNumber)}"">")
+                      .Append($"<sender>{message.Sender}</sender>")
+                      .Append($"<number>{message.PhoneNumber}</number>")
+                      .Append($"<msg>{message.Text}</msg>")
+                      .Append("</sms>");
+
+            var xml = xmlBuilder.ToString();
+
+            var data = new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("action", "send1SMS"),
+                    new KeyValuePair<string, string>("xml", xml)
+                };
+
+            return new FormUrlEncodedContent(data);
         }
 
         private string CreateSignature(string integrationKey, string phone)

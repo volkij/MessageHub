@@ -2,6 +2,7 @@
 using MessageHub.Domain.DTO;
 using MessageHub.Domain.Entities;
 using MessageHub.Infrastructure.Repositories;
+using MessageHub.Services.Base;
 using Microsoft.Extensions.Logging;
 
 namespace MessageHub.Services

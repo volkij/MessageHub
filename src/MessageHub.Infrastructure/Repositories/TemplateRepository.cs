@@ -10,9 +10,9 @@ namespace MessageHub.Infrastructure.Repositories
         {
 
         }
-        public Template GetTemplateByCode(string code)
+        public async Task<Template?> GetTemplateByCodeAsync(string code)
         {
-            return _context.Templates.FirstOrDefault(t => t.Code == code);
+            return await _context.Templates.FirstOrDefaultAsync(t => t.Code == code);
         }
 
         public async Task<List<Template>> GetAllTemplates()

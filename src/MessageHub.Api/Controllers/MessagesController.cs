@@ -44,7 +44,7 @@ namespace MessageHub.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("markasread/{messageID}")]
+        [HttpPut("{messageID}/markasread")]
         public async Task<IActionResult> MarkAsRead(int messageID)
         {
             await messageService.MarkMessageAsRead(messageID);

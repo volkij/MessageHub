@@ -2,7 +2,7 @@
 using MessageHub.Core.Abstraction.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace MessageHub.Services.Consumers
+namespace MessageHub.Services.Consumers.Base
 {
     public abstract class BaseSenderConsumer<TEvent>(ILogger<BaseSenderConsumer<TEvent>> logger, ISenderService senderService)
         : BaseConsumer(logger), IConsumer<TEvent>
@@ -16,7 +16,7 @@ namespace MessageHub.Services.Consumers
             {
                 Logger.LogInformation($"Received {typeof(TEvent).Name}: {context.MessageId}");
 
-                SendMessage(context);
+                SendMessageAsync(context);
             }
             catch (Exception ex)
             {
@@ -26,6 +26,6 @@ namespace MessageHub.Services.Consumers
             return Task.CompletedTask;
         }
 
-        protected abstract void SendMessage(ConsumeContext<TEvent> context);
+        protected abstract Task SendMessageAsync(ConsumeContext<TEvent> context);
     }
 }

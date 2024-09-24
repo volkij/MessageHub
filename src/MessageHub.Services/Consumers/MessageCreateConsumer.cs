@@ -1,7 +1,7 @@
 ﻿using MassTransit;
 using MessageHub.Domain.Events;
 using MessageHub.Services;
-using MessageHub.Services.Consumers;
+using MessageHub.Services.Consumers.Base;
 using Microsoft.Extensions.Logging;
 
 namespace MessageHub.Infrastructure.ServiceBus
@@ -10,20 +10,20 @@ namespace MessageHub.Infrastructure.ServiceBus
     {
         private readonly MessageService _messageService = messageService;
 
-        public Task Consume(ConsumeContext<MessageCreateEvent> context)
+        public async Task Consume(ConsumeContext<MessageCreateEvent> context)
         {
             try
             {
                 Logger.LogInformation("Received message: {MessageId}", context.MessageId);
 
-                _messageService.ProcessRequestToMessage(context.Message.CreateMessageRequest, context.Message.AccountName);
+                await _messageService.ProcessRequestToMessage(context.Message.CreateMessageRequest, context.Message.AccountName);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error when consuming a message");
             }
 
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
     }
 }

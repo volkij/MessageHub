@@ -2,24 +2,25 @@
 using MessageHub.Domain.Entities;
 using MessageHub.Domain.Enums;
 using MessageHub.Infrastructure.Repositories;
+using MessageHub.Services.Base;
 using Microsoft.Extensions.Logging;
 
 
 namespace MessageHub.Services.Processing
 {
     /// <summary>
-    /// Base class for services that publish messages to ServiceBus
+    /// Base class for modification message and publish to ServiceBus
     /// </summary>
     public class BaseProcessingService(ILogger<BaseService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseService(logger, unitOfWork)
     {
         protected readonly IPublishEndpoint PublishEndpoint = publishEndpoint;
 
-        protected void QueueMessage<T>(T eventMessage, Message message) where T : class
+        protected async Task QueueMessage<T>(T eventMessage, Message message) where T : class
         {
             message.MessageStatus = MessageStatus.Queued;
-            UnitOfWork.SaveChanges();
+            await UnitOfWork.SaveChangesAsync();
 
-            PublishEndpoint.Publish(eventMessage, context =>
+            await PublishEndpoint.Publish(eventMessage, context =>
             {
                 context.SetRoutingKey(Infrastructure.ServiceBus.RoutingKeys.New);
             });
