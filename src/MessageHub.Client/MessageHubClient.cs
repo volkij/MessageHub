@@ -1,4 +1,5 @@
 ﻿using MessageHub.Client.DTO;
+using MessageHub.Client.Messages;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace MessageHub.Client
     /// </summary>
     public class MessageHubClient
     {
+#warning TODO - remove default values for testing
         private string _apiKey;
         private string _baseUrl = "http://10.0.5.4:5000";
         private string _serviceName;
@@ -83,7 +85,7 @@ namespace MessageHub.Client
                 }).ToList()
             };
 
-            return await SendAsync(messageRequest, "/messages");
+            return await SendAsync(messageRequest, Constants.MessageEndpointName);
         }
 
         public async Task<Response> SendEmailAsyn(EmailMessage message, string senderCode = null)
@@ -107,7 +109,7 @@ namespace MessageHub.Client
                 }).ToList()
             };
 
-            return await SendAsync(messageRequest, "/messages");
+            return await SendAsync(messageRequest, Constants.MessageEndpointName);
         }
 
         public async Task<Response> SendPushAsyn(PushMessage message, string senderCode = null)
@@ -131,7 +133,7 @@ namespace MessageHub.Client
                 }).ToList()
             };
 
-            return await SendAsync(messageRequest, "/messages");
+            return await SendAsync(messageRequest, Constants.MessageEndpointName);
         }
 
 
@@ -144,7 +146,7 @@ namespace MessageHub.Client
                 value = tokenValue
             };
 
-            return await SendAsync(pushTokenCreateRequest, "/pushtokens");
+            return await SendAsync(pushTokenCreateRequest, Constants.PushTokenEndpointName);
         }
 
         private static readonly HttpClient client = new HttpClient();
@@ -159,7 +161,7 @@ namespace MessageHub.Client
 
             try
             {
-                var apiResponse = await client.PostAsync($"{_baseUrl}/api/v{_version}{endpoint}", content);
+                var apiResponse = await client.PostAsync($"{_baseUrl}/api/v{_version}/{endpoint}", content);
 
                 return new Response
                 {
@@ -187,6 +189,7 @@ namespace MessageHub.Client
 
         public async Task<List<Message>> GetMessagesUnreadAsync(MessageType messageType, string clientID)
         {
+#warning TODO - Add endpoint for getting unread messages
             var list = await GetMessagesAsync(messageType, clientID);
             return list.Where(m => m.ReadDate.HasValue == false).ToList();
         }
@@ -194,13 +197,13 @@ namespace MessageHub.Client
 
         public async Task<List<Message>> GetMessagesAsync(MessageType messageType, string clientID)
         {
-            string url = _baseUrl + $"/api/v{_version}/messages";
+            string url = _baseUrl + $"/api/v{_version}/message";
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("X-API-Key", _apiKey);
 
                 // Odeslání GET požadavku
-                var apiResponse = await client.GetAsync(_baseUrl + $"/api/v{_version}/messages?messageType={messageType}&externalClientId={clientID}");
+                var apiResponse = await client.GetAsync(_baseUrl + $"/api/v{_version}/{Constants.MessageEndpointName}?messageType={messageType}&externalClientId={clientID}");
 
 
                 if (!apiResponse.IsSuccessStatusCode)
@@ -222,7 +225,7 @@ namespace MessageHub.Client
                 client.DefaultRequestHeaders.Add("X-API-Key", _apiKey);
 
                 // Odeslání PUT požadavku
-                var apiResponse = await client.PutAsync(_baseUrl + $"/api/v{_version}/messages/{messageID}/markasread", null);
+                var apiResponse = await client.PutAsync(_baseUrl + $"/api/v{_version}/{Constants.MessageEndpointName}/{messageID}/markasread", null);
 
                 Response response = new Response() { StatusCode = apiResponse.StatusCode };
                 return response;

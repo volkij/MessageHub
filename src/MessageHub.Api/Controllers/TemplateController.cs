@@ -10,7 +10,7 @@ namespace MessageHub.Api.Controllers
     [ApiController]
     [ApiVersion(1)]
     [Route("api/v{v:apiVersion}/[controller]")]
-    public class TemplatesController(ILogger<MessagesController> logger, IOptions<AccountConfig> accountConfig, TemplateDownloadService templateDownService, TemplateService templateService) : BaseAccountController(logger, accountConfig)
+    public class TemplateController(ILogger<MessageController> logger, IOptions<AccountConfig> accountConfig, TemplateDownloadService templateDownService, TemplateService templateService) : BaseAccountController(logger, accountConfig)
     {
         private readonly TemplateDownloadService _templateDownService = templateDownService;
         private readonly TemplateService _templateService = templateService;

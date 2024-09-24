@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MessageHub.Client
+namespace MessageHub.Client.Messages
 {
     public static class EmailMessageHelper
     {

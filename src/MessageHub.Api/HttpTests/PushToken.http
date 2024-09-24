@@ -1,6 +1,6 @@
 
 
-POST {{HostAddress}}/api/v{{Version}}/pushtokens HTTP/1.1
+POST {{HostAddress}}/api/v{{Version}}/pushtoken HTTP/1.1
 Content-Type: application/json
 X-API-KEY: {{ApiKey}}
 

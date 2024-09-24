@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MessageHub.Client
+namespace MessageHub.Client.Messages
 {
-    public class PushMessage
+    /// <summary>
+    /// Structure for SMS message
+    /// </summary>
+    public class SmsMessage
     {
-        public string ClientId { get; set; }
-        public string Title { get; set; }
-        public string Body { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Message { get; set; }
 
         public string TemplateCode { get; set; }
 
@@ -16,7 +18,5 @@ namespace MessageHub.Client
         public string Category { get; set; }
 
         public Dictionary<string, string> ContentAttributes { get; set; }
-
-        public string ExternalMessageID { get; set; }
     }
 }

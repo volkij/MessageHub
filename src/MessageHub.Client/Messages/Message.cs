@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MessageHub.Client
+namespace MessageHub.Client.Messages
 {
     public class Message
     {

@@ -13,7 +13,7 @@ namespace MessageHub.Api.Controllers
     [ApiController]
     [ApiVersion(1)]
     [Route("api/v{v:apiVersion}/[controller]")]
-    public class MessagesController(ILogger<MessagesController> logger, IOptions<AccountConfig> accountConfig,
+    public class MessageController(ILogger<MessageController> logger, IOptions<AccountConfig> accountConfig,
         IPublishEndpoint publishEndpoint, MessageHubMetrics messageHubMetrics, MessageService messageService) : BaseAccountController(logger, accountConfig)
     {
         private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;

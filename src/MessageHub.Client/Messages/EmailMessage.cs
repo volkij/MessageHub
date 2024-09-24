@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MessageHub.Client
+namespace MessageHub.Client.Messages
 {
     /// <summary>
     /// Structure for Email message

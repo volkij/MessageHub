@@ -11,7 +11,7 @@ namespace MessageHub.Api.Controllers
     [ApiController]
     [ApiVersion(1)]
     [Route("api/v{v:apiVersion}/[controller]")]
-    public class PushTokensController(ILogger<PushTokensController> logger, IOptions<AccountConfig> accountConfig, PushTokenService pushTokenService) : BaseAccountController(logger, accountConfig)
+    public class PushTokenController(ILogger<PushTokenController> logger, IOptions<AccountConfig> accountConfig, PushTokenService pushTokenService) : BaseAccountController(logger, accountConfig)
     {
         private readonly PushTokenService _pushTokenService = pushTokenService;
 

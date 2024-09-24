@@ -1,5 +1,5 @@
 
-POST {{HostAddress}}/api/v{{Version}}/messages HTTP/1.1
+POST {{HostAddress}}/api/v{{Version}}/message HTTP/1.1
 Content-Type: application/json
 X-API-KEY: {{ApiKey}}
 
@@ -25,9 +25,9 @@ X-API-KEY: {{ApiKey}}
 }
 
 ### Request GET
-GET {{HostAddress}}/api/v{{Version}}/messages?messageType=PUSH&externalClientId=5288926 HTTP/1.1
+GET {{HostAddress}}/api/v{{Version}}/message?messageType=PUSH&externalClientId=5288926 HTTP/1.1
 X-API-KEY: {{ApiKey}}
 
 ### Request MarkAsRead
-PUT {{HostAddress}}/api/v{{Version}}/messages/3128/markasread HTTP/1.1
+PUT {{HostAddress}}/api/v{{Version}}/message/3128/markasread HTTP/1.1
 X-API-KEY: {{ApiKey}}
