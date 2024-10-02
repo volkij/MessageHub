@@ -14,80 +14,11 @@ using Microsoft.Extensions.Options;
 
 namespace MessageHub.Services
 {
-    public class MessageService : BaseService
+    public class MessageService : BaseRepositoryService
     {
-        private readonly ISenderService _senderService;
-        private readonly TemplateService _templateService;
-        private readonly IEnumerable<IMessageProcessingService> _messageProcessingServices;
-        private readonly AccountConfig _accountConfig;
-
-        public MessageService(ILogger<MessageService> logger, UnitOfWork unitOfWork, IOptions<AccountConfig> accountConfig, ISenderService senderService,
-            TemplateService templateService, IEnumerable<IMessageProcessingService> messageProcessingServices) : base(logger, unitOfWork)
+        public MessageService(ILogger<MessageService> logger, UnitOfWork unitOfWork) : base(logger, unitOfWork)
         {
-            _senderService = senderService;
-            _templateService = templateService;
-            _messageProcessingServices = messageProcessingServices;
-            _accountConfig = accountConfig.Value;
-        }
-
-        public async Task ProcessRequestToMessage(CreateMessageRequest request, string accountName)
-        {
-            Message messageEntity = Mapper.MapToEntity(request);
-            messageEntity.Account = accountName;
-
-            // If sender code is not provided, use the default sender for the account
-            if (string.IsNullOrEmpty(messageEntity.SenderCode))
-            {
-                Account account = _accountConfig.GetAccount(accountName);
-
-                messageEntity.SenderCode = messageEntity.MessageType switch
-                {
-                    MessageType.EMAIL => account.DefaultSenderEmail,
-                    MessageType.SMS => account.DefaultSenderSms,
-                    MessageType.PUSH => account.DefaultSenderPush,
-                    _ => throw new MessageHubException("Unknown message type")
-                };
-            }
-
-            SenderConfig senderConfig = _senderService.GetSenderByCode(messageEntity.SenderCode);
-
-
-            messageEntity = await _templateService.ProcessMessage(messageEntity);
-
-            await UnitOfWork.MessageRepository.InsertAsync(messageEntity);
-            await UnitOfWork.SaveChangesAsync();
-
-            if (messageEntity.MessageStatus != MessageStatus.Failed)
-            {
-                MessageServiceValidator messageValidator = new MessageServiceValidator();
-                var validationResult = messageValidator.Validate(messageEntity);
-
-                if (validationResult.IsValid)
-                {
-                    if (messageEntity.Expiration < DateTime.UtcNow)
-                    {
-                        await ChangeMessageStatus(messageEntity, MessageStatus.Expired);
-                        return;
-                    }
-
-                    var processor = _messageProcessingServices.FirstOrDefault(p => p.MessageType == messageEntity.MessageType);
-                    if (processor == null)
-                    {
-                        throw new MessageHubException("Invalid message type");
-                    }
-                    await processor.ProcessMessage(messageEntity, senderConfig);
-                }
-                else
-                {
-                    foreach (var error in validationResult.Errors)
-                    {
-                        Logger.LogWarning($"Message {messageEntity.Id} validation error: {error.ErrorMessage}");
-                    }
-
-                    await ChangeMessageStatus(messageEntity, MessageStatus.Failed);
-                }
-            }
-
+            
         }
 
         public async Task<Message> GetByIdAsync(int id)
@@ -99,6 +30,12 @@ namespace MessageHub.Services
         {
             message.MessageStatus = status;
             await UnitOfWork.SaveChangesAsync();
+        }
+    
+        public async Task MarkMessageAsSent(Message message)
+        {
+            message.SentDate = DateTime.UtcNow;
+            await ChangeMessageStatus(message, MessageStatus.Sent);
         }
 
         public async Task<List<GetMessageResponse>> GetMessagesByTypeAndExternalClientAsync(string messageType, string externalClientID)

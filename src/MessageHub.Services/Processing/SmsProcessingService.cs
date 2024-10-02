@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace MessageHub.Services.Processing
 {
-    public class SmsProcessingService(ILogger<MessageService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseProcessingService(logger, unitOfWork, publishEndpoint), IMessageProcessingService
+    public class SmsProcessingService(ILogger<SmsProcessingService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseProcessingService(logger, unitOfWork, publishEndpoint), IMessageProcessingService
     {
         public MessageType MessageType => MessageType.SMS;
 

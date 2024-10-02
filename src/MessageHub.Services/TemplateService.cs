@@ -10,7 +10,7 @@ namespace MessageHub.Services
     /// <summary>
     /// Service for managing templates
     /// </summary>
-    public class TemplateService(ILogger<TemplateService> logger, UnitOfWork unitOfWork) : BaseService(logger, unitOfWork)
+    public class TemplateService(ILogger<TemplateService> logger, UnitOfWork unitOfWork) : BaseRepositoryService(logger, unitOfWork)
     {
         /// <summary>
         /// Apply template to message

@@ -11,7 +11,7 @@ namespace MessageHub.Services
     /// <summary>
     /// Service for downloading templates from a remote server
     /// </summary>
-    public class TemplateDownloadService(ILogger<TemplateDownloadService> logger, UnitOfWork unitOfWork) : BaseService(logger, unitOfWork)
+    public class TemplateDownloadService(ILogger<TemplateDownloadService> logger, UnitOfWork unitOfWork) : BaseRepositoryService(logger, unitOfWork)
     {
         private readonly HttpClient _httpClient = new HttpClient();
 

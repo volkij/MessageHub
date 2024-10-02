@@ -13,41 +13,55 @@ using Microsoft.Extensions.Options;
 namespace MessageHub.Services
 {
     /// <summary>
-    /// Service for sending messages to provider
+    /// Service for sending messages to providers
     /// </summary>
-    public class SenderService(ILogger<SenderService> logger, IOptions<List<SenderConfig>> senders, UnitOfWork unitOfWork,
-        ProviderFactory providerFactory, IPublishEndpoint publishEndpoint) : BaseService(logger, unitOfWork), ISenderService
+    public class SenderService : BaseService, ISenderService
     {
-        private readonly List<SenderConfig> _senders = senders.Value;
-        private readonly ProviderFactory _providerFactory = providerFactory;
-        private readonly IPublishEndpoint _publishEndpoint = publishEndpoint;
 
-        public SenderConfig GetSenderByCode(string senderCode)
+        private readonly SenderConfigurationService _senderConfigurationService;
+        private readonly IProviderFactory _providerFactory;
+        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly MessageService _messageService;
+        
+        /// <param name="sendersConfigurationList">List of senders configurations</param>
+        /// <param name="logger"></param>
+        /// <param name="unitOfWork"></param>
+        /// <param name="providerFactory">Provider factory class for managing providers instances</param>
+        /// <param name="publishEndpoint"></param>
+        public SenderService(SenderConfigurationService senderConfigurationService, ILogger<SenderService> logger, MessageService messageService,
+            IProviderFactory providerFactory, IPublishEndpoint publishEndpoint) : base(logger)
         {
-            var senderConfig = _senders.FirstOrDefault(s => s.Code.Equals(senderCode, StringComparison.OrdinalIgnoreCase))
-                ?? throw new MessageHubException($"Sender with code {senderCode} not found");
-            return senderConfig;
+            _senderConfigurationService = senderConfigurationService;
+            _messageService = messageService;
+            _providerFactory = providerFactory;
+            _publishEndpoint = publishEndpoint;
         }
-
+        
+        /// <summary>
+        /// Send message to specific provider.
+        /// </summary>
+        /// <param name="messageID"></param>
+        /// <param name="message"></param>
+        /// <param name="senderCode"></param>
+        /// <param name="messageType"></param>
+        /// <typeparam name="TMessage"></typeparam>
         public async Task SendMessageAsync<TMessage>(int messageID, TMessage message, string senderCode, MessageType messageType)
         {
-            Message dbMessage = UnitOfWork.MessageRepository.GetById(messageID);
+            var dbMessage = await _messageService.GetByIdAsync(messageID);
             try
             {
-                var senderConfig = this.GetSenderByCode(senderCode);
+                var senderConfig = _senderConfigurationService.GetSenderConfiguration(senderCode);
                 var provider = _providerFactory.GetProvider<TMessage>(senderConfig, messageType);
 
-
-                dbMessage.MessageStatus = MessageStatus.Sent;
-                dbMessage.SentDate = DateTime.UtcNow;
-
+                await _messageService.MarkMessageAsSent(dbMessage);
+              
                 Logger.LogInformation("Sending {messageType} message {messageID}", messageType, messageID);
 
-                var result = provider.SendAsync(message).Result;
+                var result = await provider.SendAsync(message);
 
                 if (!result.IsSuccess)
                 {
-                    dbMessage.MessageStatus = MessageStatus.SentFailed;
+                    await _messageService.ChangeMessageStatus(dbMessage, MessageStatus.SentFailed);
                 }
 
                 await _publishEndpoint.Publish(new ProviderResultEvent(result, dbMessage.Id), context =>
@@ -58,14 +72,8 @@ namespace MessageHub.Services
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error while sending message {messageID}", messageID);
-                dbMessage.MessageStatus = MessageStatus.SentFailed;
-
-            }
-            finally
-            {
-                await UnitOfWork.SaveChangesAsync();
+                await _messageService.ChangeMessageStatus(dbMessage, MessageStatus.SentFailed);
             }
         }
-
     }
 }

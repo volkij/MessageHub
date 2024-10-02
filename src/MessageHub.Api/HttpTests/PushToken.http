@@ -6,7 +6,7 @@ X-API-KEY: {{ApiKey}}
 
 {
   "externalClientID": "12345",
-  "value": "token1"
+  "value": "token2"
 }
 
 

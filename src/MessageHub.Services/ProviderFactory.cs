@@ -1,11 +1,12 @@
 ﻿using MessageHub.Shared;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using MessageHub.Core.Abstraction.Interfaces;
 
 /// <summary>
 /// Create or retrieve Sender provider instances
 /// </summary>
-public class ProviderFactory
+public class ProviderFactory : IProviderFactory
 {
     private readonly ILogger<ProviderFactory> _logger;
     private readonly IServiceProvider _serviceProvider;
@@ -23,7 +24,7 @@ public class ProviderFactory
 
         if (!_providers.ContainsKey(key))
         {
-            Type type = GetType(senderConfig.ClassName, senderConfig.AssemblyName);
+            Type type = GetAssemblyType(senderConfig.ClassName, senderConfig.AssemblyName);
 
             _logger.LogDebug($"Creating instance of provider for {senderConfig.Code} and message type {messageType}");
 
@@ -39,7 +40,7 @@ public class ProviderFactory
         return (IProvider<TMessage>)_providers[key];
     }
 
-    private static Type GetType(string className, string assemblyName)
+    private Type GetAssemblyType(string className, string assemblyName)
     {
         Assembly assembly = Assembly.Load(assemblyName);
         if (assembly == null)

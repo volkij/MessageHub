@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MessageHub.Services.Processing
 {
-    public class PushProcessingService(ILogger<MessageService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseProcessingService(logger, unitOfWork, publishEndpoint), IMessageProcessingService
+    public class PushProcessingService(ILogger<PushProcessingService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseProcessingService(logger, unitOfWork, publishEndpoint), IMessageProcessingService
     {
         public MessageType MessageType => MessageType.PUSH;
 

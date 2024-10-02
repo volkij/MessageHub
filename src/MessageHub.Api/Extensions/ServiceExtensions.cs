@@ -85,8 +85,10 @@ namespace MessageHub.Api.Extensions
 
         public static void ConfigureServices(this IServiceCollection services)
         {
+            services.AddScoped<SenderConfigurationService>();
             services.AddScoped<ISenderService, SenderService>();
-            services.AddSingleton<ProviderFactory>();
+            services.AddSingleton<IProviderFactory, ProviderFactory>();
+            services.AddScoped<MessageRequestService>();
             services.AddScoped<UnitOfWork>();
             services.AddScoped<MessageService>();
             services.AddScoped<TemplateService>();

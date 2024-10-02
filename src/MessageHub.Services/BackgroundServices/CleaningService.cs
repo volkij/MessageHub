@@ -29,23 +29,32 @@ namespace MessageHub.Services.BackgroundServices
 
         private async void ExecuteCleaningTask(object state)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            try
             {
-                var unitOfWork = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
-
-                var stopwatch = Stopwatch.StartNew();
-                List<Message> messagesToDelete = await unitOfWork.MessageRepository.GetMessagesOlderThan(DateTime.Now.AddDays(_config.MessageRetentionDays * -1).ToUniversalTime());
-
-                foreach (var message in messagesToDelete)
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    unitOfWork.MessageRepository.Delete(message);
+                    var unitOfWork = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+
+                    var stopwatch = Stopwatch.StartNew();
+                    List<Message> messagesToDelete = await unitOfWork.MessageRepository
+                        .GetMessagesOlderThanAsyn(DateTime.Now.AddDays(_config.MessageRetentionDays * -1).ToUniversalTime());
+
+                    foreach (var message in messagesToDelete)
+                    {
+                        unitOfWork.MessageRepository.Delete(message);
+                    }
+
+                    await unitOfWork.SaveChangesAsync();
+                    stopwatch.Stop();
+
+                    Logger.LogInformation("{0} messages deleted in {1} milliseconds", messagesToDelete.Count, stopwatch.Elapsed.TotalMilliseconds);
                 }
-
-                await unitOfWork.SaveChangesAsync();
-                stopwatch.Stop();
-
-                Logger.LogInformation("{0} messages deleted in {1} milliseconds", messagesToDelete.Count, stopwatch.Elapsed.TotalMilliseconds);
             }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error cleaning up old messages");
+            }
+            
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

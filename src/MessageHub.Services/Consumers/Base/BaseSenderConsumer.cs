@@ -10,20 +10,18 @@ namespace MessageHub.Services.Consumers.Base
     {
         protected readonly ISenderService SenderService = senderService;
 
-        public Task Consume(ConsumeContext<TEvent> context)
+        public async Task Consume(ConsumeContext<TEvent> context)
         {
             try
             {
-                Logger.LogInformation($"Received {typeof(TEvent).Name}: {context.MessageId}");
+                Logger.LogInformation($"XX_Received {typeof(TEvent).Name}: {context.MessageId}");
 
-                SendMessageAsync(context);
+                await SendMessageAsync(context);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, $"Error when consuming a {typeof(TEvent).Name}");
             }
-
-            return Task.CompletedTask;
         }
 
         protected abstract Task SendMessageAsync(ConsumeContext<TEvent> context);

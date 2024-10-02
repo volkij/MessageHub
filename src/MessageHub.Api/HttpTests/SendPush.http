@@ -7,8 +7,9 @@ X-API-KEY: {{ApiKey}}
   "type": "push",
   "externalClientID": "12345",
   "content": "Ahoj $@Jmeno@$ MessageHub",
-  "subject": "Pozdrav z MessageHub vèetnì expirace ",
+  "subject": "Pozdrav z MessageHub ",
   "category": "WELCOME",
+  "templateCode" : "Template3",
   "contentAttributes": [
     {
       "name": "Jmeno",

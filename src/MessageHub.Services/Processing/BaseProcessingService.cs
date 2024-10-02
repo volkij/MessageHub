@@ -11,10 +11,16 @@ namespace MessageHub.Services.Processing
     /// <summary>
     /// Base class for modification message and publish to ServiceBus
     /// </summary>
-    public class BaseProcessingService(ILogger<BaseService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseService(logger, unitOfWork)
+    public class BaseProcessingService : BaseRepositoryService
     {
-        protected readonly IPublishEndpoint PublishEndpoint = publishEndpoint;
+        protected readonly IPublishEndpoint PublishEndpoint;
 
+        public BaseProcessingService(ILogger<BaseProcessingService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : base(logger, unitOfWork)
+        {
+            PublishEndpoint = publishEndpoint;
+        }
+        
+        
         protected async Task QueueMessage<T>(T eventMessage, Message message) where T : class
         {
             message.MessageStatus = MessageStatus.Queued;

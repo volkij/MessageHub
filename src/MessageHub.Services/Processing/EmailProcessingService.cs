@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MessageHub.Services.Processing
 {
-    public class EmailProcessingService(ILogger<MessageService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseProcessingService(logger, unitOfWork, publishEndpoint), IMessageProcessingService
+    public class EmailProcessingService(ILogger<EmailProcessingService> logger, UnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) : BaseProcessingService(logger, unitOfWork, publishEndpoint), IMessageProcessingService
     {
         public MessageType MessageType => MessageType.EMAIL;
 

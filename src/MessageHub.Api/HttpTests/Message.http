@@ -6,7 +6,7 @@ X-API-KEY: {{ApiKey}}
 {
   "type": "email",
   "contactValue": "test@test.com",
-  "content": "<p>Ahoj $@Jmeno@$,</p>\n<p>Dìkujeme, že jste se pøihlásili k odbìru našich novinek. Jsme rádi, že vás máme mezi námi!</p>\n<p>Pro více informací navštivte náš web.</p>\n<p>S pozdravem,<br>Tým $@Company@$</p>",
+  "content": "<p>Ahoj $@Jmeno@$,</p>\n<p>Dï¿½kujeme, ï¿½e jste se pï¿½ihlï¿½sili k odbï¿½ru naï¿½ich novinek. Jsme rï¿½di, ï¿½e vï¿½s mï¿½me mezi nï¿½mi!</p>\n<p>Pro vï¿½ce informacï¿½ navï¿½tivte nï¿½ web.</p>\n<p>S pozdravem,<br>Tï¿½m $@Company@$</p>",
   "subject": "test",
   "tags": [
     "test",
@@ -29,5 +29,5 @@ GET {{HostAddress}}/api/v{{Version}}/message?messageType=PUSH&externalClientId=5
 X-API-KEY: {{ApiKey}}
 
 ### Request MarkAsRead
-PUT {{HostAddress}}/api/v{{Version}}/message/3128/markasread HTTP/1.1
+PUT {{HostAddress}}/api/v{{Version}}/message/6/markasread HTTP/1.1
 X-API-KEY: {{ApiKey}}

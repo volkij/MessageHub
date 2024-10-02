@@ -10,7 +10,7 @@ namespace MessageHub.Services
     /// <summary>
     /// Service for managing push tokens
     /// </summary>
-    public class PushTokenService(ILogger<PushTokenService> logger, UnitOfWork unitOfWork) : BaseService(logger, unitOfWork)
+    public class PushTokenService(ILogger<PushTokenService> logger, UnitOfWork unitOfWork) : BaseRepositoryService(logger, unitOfWork)
     {
         public async Task<bool> SavePushToken(Account account, CreatePushTokenRequest createPushTokenRequest)
         {

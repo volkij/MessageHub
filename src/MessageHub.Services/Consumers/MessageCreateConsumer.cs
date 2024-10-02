@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace MessageHub.Infrastructure.ServiceBus
 {
-    public class MessageCreateConsumer(ILogger<MessageCreateConsumer> logger, MessageService messageService) : BaseConsumer(logger), IConsumer<MessageCreateEvent>
+    public class MessageCreateConsumer(ILogger<MessageCreateConsumer> logger, MessageRequestService messageRequestService) : BaseConsumer(logger), IConsumer<MessageCreateEvent>
     {
-        private readonly MessageService _messageService = messageService;
+        private readonly MessageRequestService _messageRequestService = messageRequestService;
 
         public async Task Consume(ConsumeContext<MessageCreateEvent> context)
         {
@@ -16,7 +16,7 @@ namespace MessageHub.Infrastructure.ServiceBus
             {
                 Logger.LogInformation("Received message: {MessageId}", context.MessageId);
 
-                await _messageService.ProcessRequestToMessage(context.Message.CreateMessageRequest, context.Message.AccountName);
+                await _messageRequestService.ProcessRequestToMessage(context.Message.CreateMessageRequest, context.Message.AccountName);
             }
             catch (Exception ex)
             {

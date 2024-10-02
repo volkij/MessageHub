@@ -7,7 +7,7 @@ namespace MessageHub.Infrastructure.Repositories
 {
     public class MessageRepository(MessageDbContext context) : BaseRepository<Message>(context)
     {
-        public async Task<List<Message>> GetMessagesOlderThan(DateTime dateTo)
+        public async Task<List<Message>> GetMessagesOlderThanAsyn(DateTime dateTo)
         {
             return await _context.Messages.Where(m => m.CreateDate < dateTo).ToListAsync();
         }
