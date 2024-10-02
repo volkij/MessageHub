@@ -14,6 +14,9 @@ using Microsoft.Extensions.Options;
 
 namespace MessageHub.Services
 {
+    /// <summary>
+    /// Service for managed messages entities
+    /// </summary>
     public class MessageService : BaseRepositoryService
     {
         public MessageService(ILogger<MessageService> logger, UnitOfWork unitOfWork) : base(logger, unitOfWork)
@@ -21,6 +24,13 @@ namespace MessageHub.Services
             
         }
 
+        public async Task<Message> InsertAsync(Message message)
+        {
+            await UnitOfWork.MessageRepository.InsertAsync(message);
+            await UnitOfWork.SaveChangesAsync();
+            return message;
+        }
+        
         public async Task<Message> GetByIdAsync(int id)
         {
             return await UnitOfWork.MessageRepository.GetByIdAsync(id);
@@ -59,8 +69,7 @@ namespace MessageHub.Services
 
             return responseList;
         }
-
-
+        
         public async Task MarkMessageAsRead(int messageId)
         {
             var message = await UnitOfWork.MessageRepository.GetByIdAsync(messageId)

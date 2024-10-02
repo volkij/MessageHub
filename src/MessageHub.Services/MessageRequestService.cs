@@ -17,7 +17,7 @@ namespace MessageHub.Services;
 /// <summary>
 /// Service for processing incoming message requests
 /// </summary>
-public class MessageRequestService : BaseRepositoryService
+public class MessageRequestService : BaseService, IMessageRequestService
 {
     private readonly AccountConfig _accountConfig;
     private readonly SenderConfigurationService _senderConfigurationService;
@@ -25,9 +25,9 @@ public class MessageRequestService : BaseRepositoryService
     private readonly MessageService _messageService;
     private readonly IEnumerable<IMessageProcessingService> _messageProcessingServices;
     
-    public MessageRequestService(ILogger<MessageRequestService> logger, UnitOfWork unitOfWork, IOptions<AccountConfig> accountConfig,
+    public MessageRequestService(ILogger<MessageRequestService> logger, IOptions<AccountConfig> accountConfig,
         SenderConfigurationService senderConfigurationService, TemplateService templateService,
-        MessageService messageService, IEnumerable<IMessageProcessingService> messageProcessingServices) : base(logger, unitOfWork)
+        MessageService messageService, IEnumerable<IMessageProcessingService> messageProcessingServices) : base(logger)
     {
         _accountConfig = accountConfig.Value;
         _senderConfigurationService = senderConfigurationService;
@@ -59,8 +59,7 @@ public class MessageRequestService : BaseRepositoryService
 
             messageEntity = await _templateService.ProcessMessage(messageEntity);
 
-            await UnitOfWork.MessageRepository.InsertAsync(messageEntity);
-            await UnitOfWork.SaveChangesAsync();
+            await _messageService.InsertAsync(messageEntity);
 
             if (messageEntity.MessageStatus != MessageStatus.Failed)
             {

@@ -88,7 +88,7 @@ namespace MessageHub.Api.Extensions
             services.AddScoped<SenderConfigurationService>();
             services.AddScoped<ISenderService, SenderService>();
             services.AddSingleton<IProviderFactory, ProviderFactory>();
-            services.AddScoped<MessageRequestService>();
+            services.AddScoped<IMessageRequestService, MessageRequestService>();
             services.AddScoped<UnitOfWork>();
             services.AddScoped<MessageService>();
             services.AddScoped<TemplateService>();
